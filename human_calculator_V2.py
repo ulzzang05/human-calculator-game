@@ -5,7 +5,8 @@ import streamlit as st
 from x402 import x402ResourceServerSync
 from x402.http import HTTPFacilitatorClientSync
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
-from wallet_connect import WalletConnect
+from streamlit_wallet_connect import st_wallet_connect
+
 
 FACILITATOR_URL = "https://x402.org/facilitator" 
 MY_WALLET = "0xbff408b144993913af7b93406d24ad35cbb38a82"
@@ -127,7 +128,7 @@ if st.session_state.game_step == 'start':
     st.write('### 🛡️ Pay-to-Play')
     st.write('This game requires a micro-payment of 0.01 Test USDC on Base Sepolia.')
     
-    paid = wallet_connect(
+    paid = st_wallet_connect(
         label="send", 
         key="pay_to_play",
         message="Pay 0.01 USDC to Play",
