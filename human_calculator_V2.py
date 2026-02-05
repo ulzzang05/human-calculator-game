@@ -1,9 +1,24 @@
-import streamlit as st
 import random
 import time
 import math
+import streamlit as st
+from x402 import x402ResourceServerSync
+from x402.http import HTTPFacilitatorClientSync
+from x402.mechanisms.evm.exact import ExactEvmServerScheme
+from wallet_connect import WalletConnect
+
+FACILITATOR_URL = "https://x402.org/facilitator" 
+MY_WALLET = "0xbff408b144993913af7b93406d24ad35cbb38a82"
+NETWORK = "eip155:84532"  
+
+# Initialize the x402 Server Logic
+facilitator = HTTPFacilitatorClientSync(url=FACILITATOR_URL)
+x402_server = x402ResourceServerSync(facilitator)
+x402_server.register(NETWORK, ExactEvmServerScheme())
 
 # --- INITIALIZATION ---
+if 'payment_verified' not in st.session_state:
+    st.session_state.payment_verified = False
 if 'score' not in st.session_state:
     st.session_state.score = 0
 if 'game_step' not in st.session_state:
@@ -109,12 +124,27 @@ st.sidebar.metric('Total Score', st.session_state.score)
 # --- GAME LOGIC ---
 
 if st.session_state.game_step == 'start':
-    st.write('Welcome to Human Calculator! Choose difficulty and operations in the sidebar.')
-    st.write('You must answer within the time allowed for the difficulty; points scale with difficulty.')
-    if st.button('Start Game'):
-        generate_question(difficulty, operations)
-        st.experimental_rerun()
+    st.write('### 🛡️ Pay-to-Play')
+    st.write('This game requires a micro-payment of 0.01 Test USDC on Base Sepolia.')
+    
+    paid = wallet_connect(
+        label="send", 
+        key="pay_to_play",
+        message="Pay 0.01 USDC to Play",
+        contract_address="0x036CbD53842c5426634e7929541eC2318f3dCF7e", 
+        amount="10000", 
+        to_address=MY_WALLET 
+    )
 
+    if paid:
+            st.session_state.payment_verified = True
+            st.success("Payment Verified! Unlocking game...")
+            time.sleep(1)
+            st.rerun()
+    if st.session_state.paid:
+        if st.button('Start Game'):
+            generate_question(difficulty, operations)
+            st.rerun()
 
 elif st.session_state.game_step == 'show_nums':
     q = st.session_state.current_question
