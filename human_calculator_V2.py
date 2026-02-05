@@ -4,6 +4,7 @@ import math
 import streamlit as st
 from x402 import x402ResourceServerSync
 from x402.http import HTTPFacilitatorClientSync
+from x402.http import FacilitatorConfig
 from x402.mechanisms.evm.exact import ExactEvmServerScheme
 from wallet_connect import wallet_connect
 
@@ -13,7 +14,8 @@ MY_WALLET = "0xbff408b144993913af7b93406d24ad35cbb38a82"
 NETWORK = "eip155:84532"  
 
 # Initialize the x402 Server Logic
-facilitator = HTTPFacilitatorClientSync(url=FACILITATOR_URL)
+config = FacilitatorConfig(FACILITATOR_URL)
+facilitator = HTTPFacilitatorClientSync(config)
 x402_server = x402ResourceServerSync(facilitator)
 x402_server.register(NETWORK, ExactEvmServerScheme())
 
